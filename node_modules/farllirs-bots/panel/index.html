@@ -1,0 +1,2309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farllirs Bots - Panel de Control</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      /* Colores principales */
+      --primary: #7289DA;
+      --primary-light: #8EA1E1;
+      --primary-dark: #5B73C4;
+      --secondary: #2C2F33;
+      --secondary-light: #36393F;
+      --secondary-dark: #23272A;
+      
+      /* Estados */
+      --success: #43B581;
+      --danger: #F04747;
+      --warning: #FAA61A;
+      --info: #00B0F4;
+      
+      /* Fondos y textos */
+      --bg-dark: #23272A;
+      --bg-medium: #2C2F33;
+      --bg-light: #36393F;
+      --bg-lighter: #40444B;
+      --text-bright: #FFFFFF;
+      --text-normal: #DCDDDE;
+      --text-muted: #72767D;
+      --text-link: #00B0F4;
+      
+      /* Bordes y sombras */
+      --border: #40444B;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      
+      /* Espaciado y tamaños */
+      --radius: 5px;
+      --header-height: 60px;
+      --sidebar-width: 240px;
+      --sidebar-collapsed: 70px;
+      --content-max-width: 1200px;
+      
+      /* Transiciones */
+      --transition-fast: 0.15s ease;
+      --transition-normal: 0.3s ease;
+    }
+    
+    /* Tema claro */
+    [data-theme="light"] {
+      --primary: #7289DA;
+      --primary-light: #8EA1E1;
+      --primary-dark: #5B73C4;
+      --secondary: #F2F3F5;
+      --secondary-light: #FFFFFF;
+      --secondary-dark: #E3E5E8;
+      
+      /* Estados */
+      --success: #43B581;
+      --danger: #F04747;
+      --warning: #FAA61A;
+      --info: #00B0F4;
+      
+      /* Fondos y textos */
+      --bg-dark: #E3E5E8;
+      --bg-medium: #F2F3F5;
+      --bg-light: #FFFFFF;
+      --bg-lighter: #F6F6F7;
+      --text-bright: #060607;
+      --text-normal: #2E3338;
+      --text-muted: #747F8D;
+      --text-link: #00B0F4;
+      
+      /* Bordes y sombras */
+      --border: #DCDDDE;
+      --shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    /* Estilos base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Whitney', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+    
+    html, body {
+      height: 100%;
+      background-color: var(--bg-medium);
+      color: var(--text-normal);
+      transition: background-color var(--transition-normal), color var(--transition-normal);
+    }
+    
+    body {
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+    
+    /* Estilos para dispositivo móvil por defecto */
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100%;
+    }
+    
+    /* Header */
+    .header {
+      height: var(--header-height);
+      background-color: var(--bg-dark);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
+    
+    .header-logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-bright);
+      margin-right: auto;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      background-color: var(--bg-dark);
+      width: 100%;
+      height: 60px;
+      overflow-x: auto;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      box-shadow: var(--shadow);
+    }
+    
+    .sidebar-nav {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .nav-item {
+      padding: 8px 12px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      white-space: nowrap;
+      color: var(--text-normal);
+      transition: background-color var(--transition-fast);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .nav-item:hover {
+      background-color: var(--bg-lighter);
+    }
+    
+    .nav-item.active {
+      background-color: var(--primary);
+      color: var(--text-bright);
+    }
+    
+    .nav-item i {
+      font-size: 1.2rem;
+    }
+    
+    /* Main content */
+    .main-content {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+    }
+    
+    /* Cards */
+    .card {
+      background-color: var(--bg-light);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+      overflow: hidden;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-bright);
+    }
+    
+    .card-body {
+      padding: 16px;
+    }
+    
+    .card-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    
+    /* Botones */
+    .btn {
+      padding: 8px 16px;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary);
+      color: var(--text-bright);
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+    }
+    
+    .btn-secondary {
+      background-color: var(--bg-lighter);
+      color: var(--text-normal);
+    }
+    
+    .btn-secondary:hover {
+      background-color: var(--border);
+    }
+    
+    .btn-success {
+      background-color: var(--success);
+      color: var(--text-bright);
+    }
+    
+    .btn-success:hover {
+      background-color: #3ca374;
+    }
+    
+    .btn-danger {
+      background-color: var(--danger);
+      color: var(--text-bright);
+    }
+    
+    .btn-danger:hover {
+      background-color: #e03e3e;
+    }
+    
+    .btn-icon {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Formularios */
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--text-bright);
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background-color: var(--bg-lighter);
+      color: var(--text-normal);
+      transition: border-color var(--transition-fast);
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(114, 137, 218, 0.25);
+    }
+    
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .form-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2372767D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+      padding-right: 40px;
+    }
+    
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .badge-success {
+      background-color: var(--success);
+      color: var(--text-bright);
+    }
+    
+    .badge-danger {
+      background-color: var(--danger);
+      color: var(--text-bright);
+    }
+    
+    .badge-warning {
+      background-color: var(--warning);
+      color: var(--text-bright);
+    }
+    
+    .badge-info {
+      background-color: var(--info);
+      color: var(--text-bright);
+    }
+    
+    /* Alertas */
+    .alert {
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .alert-success {
+      background-color: rgba(67, 181, 129, 0.1);
+      border-left: 4px solid var(--success);
+      color: var(--success);
+    }
+    
+    .alert-danger {
+      background-color: rgba(240, 71, 71, 0.1);
+      border-left: 4px solid var(--danger);
+      color: var(--danger);
+    }
+    
+    .alert-warning {
+      background-color: rgba(250, 166, 26, 0.1);
+      border-left: 4px solid var(--warning);
+      color: var(--warning);
+    }
+    
+    .alert-info {
+      background-color: rgba(0, 176, 244, 0.1);
+      border-left: 4px solid var(--info);
+      color: var(--info);
+    }
+    
+    /* Toasts */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .toast {
+      background-color: var(--bg-light);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 12px 16px;
+      min-width: 250px;
+      max-width: 350px;
+      animation: slideIn 0.3s ease forwards;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .toast-success {
+      border-left: 4px solid var(--success);
+    }
+    
+    .toast-danger {
+      border-left: 4px solid var(--danger);
+    }
+    
+    .toast-warning {
+      border-left: 4px solid var(--warning);
+    }
+    
+    .toast-info {
+      border-left: 4px solid var(--info);
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    /* Modales */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.2s ease forwards;
+    }
+    
+    .modal {
+      background-color: var(--bg-light);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: scaleIn 0.2s ease forwards;
+    }
+    
+    .modal-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-bright);
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+    
+    .modal-body {
+      padding: 16px;
+    }
+    
+    .modal-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    
+    @keyframes scaleIn {
+      from {
+        transform: scale(0.9);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    
+    /* Utilidades */
+    .hidden {
+      display: none !important;
+    }
+    
+    .flex {
+      display: flex;
+    }
+    
+    .flex-col {
+      flex-direction: column;
+    }
+    
+    .items-center {
+      align-items: center;
+    }
+    
+    .justify-between {
+      justify-content: space-between;
+    }
+    
+    .gap-2 {
+      gap: 8px;
+    }
+    
+    .gap-4 {
+      gap: 16px;
+    }
+    
+    .mt-2 {
+      margin-top: 8px;
+    }
+    
+    .mt-4 {
+      margin-top: 16px;
+    }
+    
+    .mb-2 {
+      margin-bottom: 8px;
+    }
+    
+    .mb-4 {
+      margin-bottom: 16px;
+    }
+    
+    .w-full {
+      width: 100%;
+    }
+    
+    .text-center {
+      text-align: center;
+    }
+    
+    .text-sm {
+      font-size: 0.875rem;
+    }
+    
+    .text-lg {
+      font-size: 1.125rem;
+    }
+    
+    .text-xl {
+      font-size: 1.25rem;
+    }
+    
+    .font-bold {
+      font-weight: 700;
+    }
+    
+    .text-muted {
+      color: var(--text-muted);
+    }
+    
+    .text-bright {
+      color: var(--text-bright);
+    }
+    
+    /* Spinner de carga */
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(114, 137, 218, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    
+    /* Estilos para PC */
+    @media (min-width: 768px) {
+      .app-container {
+        flex-direction: row;
+      }
+      
+      .sidebar {
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 16px 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+      
+      .sidebar-nav {
+        flex-direction: column;
+        width: 100%;
+      }
+      
+      .nav-item {
+        width: 100%;
+        padding: 10px 16px;
+        border-radius: 0;
+      }
+      
+      .main-content {
+        width: calc(100% - var(--sidebar-width));
+        padding: 24px;
+      }
+      
+      .card {
+        margin-bottom: 24px;
+      }
+      
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 24px;
+      }
+    }
+    
+    /* Estilos para el selector de dispositivo */
+    .device-selector {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--bg-dark);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+    
+    .device-selector h2 {
+      color: var(--text-bright);
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    .device-options {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .device-option {
+      background-color: var(--bg-light);
+      border-radius: var(--radius);
+      padding: 20px;
+      width: 160px;
+      height: 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform var(--transition-fast), background-color var(--transition-fast);
+    }
+    
+    .device-option:hover {
+      transform: translateY(-5px);
+      background-color: var(--primary);
+    }
+    
+    .device-option i {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      color: var(--text-bright);
+    }
+    
+    .device-option span {
+      font-weight: 600;
+      color: var(--text-bright);
+    }
+    
+    /* Estilos para el editor de código */
+    .code-editor {
+      font-family: 'Fira Code', monospace;
+      background-color: #1E1E1E;
+      color: #D4D4D4;
+      padding: 12px;
+      border-radius: var(--radius);
+      overflow: auto;
+      line-height: 1.5;
+    }
+    
+    /* Estilos para el modo colapsado del sidebar */
+    .sidebar.collapsed {
+      width: var(--sidebar-collapsed);
+    }
+    
+    .sidebar.collapsed .nav-text {
+      display: none;
+    }
+    
+    .sidebar.collapsed + .main-content {
+      width: calc(100% - var(--sidebar-collapsed));
+    }
+    
+    /* Botón para colapsar sidebar */
+    .collapse-sidebar {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--bg-lighter);
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-normal);
+      transition: background-color var(--transition-fast);
+    }
+    
+    .collapse-sidebar:hover {
+      background-color: var(--primary);
+      color: var(--text-bright);
+    }
+    
+    /* Estilos para el selector de tema */
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: var(--text-normal);
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      transition: background-color var(--transition-fast);
+    }
+    
+    .theme-toggle:hover {
+      background-color: var(--bg-lighter);
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  <!-- Selector de dispositivo -->
+  <div class="device-selector" id="deviceSelector">
+    <h2>¿Qué dispositivo estás utilizando?</h2>
+    <div class="device-options">
+      <div class="device-option" data-device="mobile">
+        <i class="fas fa-mobile-alt"></i>
+        <span>Móvil</span>
+      </div>
+      <div class="device-option" data-device="desktop">
+        <i class="fas fa-desktop"></i>
+        <span>PC</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor principal -->
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-logo">Farllirs Bots</div>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle">
+          <i class="fas fa-moon"></i>
+        </button>
+        <button class="btn btn-primary" id="addBotBtn">
+          <i class="fas fa-plus"></i>
+          <span class="mobile-hidden">Nuevo Bot</span>
+        </button>
+      </div>
+    </header>
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <div class="nav-item active" data-tab="dashboard">
+          <i class="fas fa-tachometer-alt"></i>
+          <span class="nav-text">Dashboard</span>
+        </div>
+        <div class="nav-item" data-tab="bots">
+          <i class="fas fa-robot"></i>
+          <span class="nav-text">Mis Bots</span>
+        </div>
+        <div class="nav-item" data-tab="commands">
+          <i class="fas fa-terminal"></i>
+          <span class="nav-text">Comandos</span>
+        </div>
+        <div class="nav-item" data-tab="servers">
+          <i class="fas fa-server"></i>
+          <span class="nav-text">Servidores</span>
+        </div>
+        <div class="nav-item" data-tab="settings">
+          <i class="fas fa-cog"></i>
+          <span class="nav-text">Configuración</span>
+        </div>
+      </nav>
+      <button class="collapse-sidebar" id="collapseSidebar">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+    </aside>
+    
+    <!-- Contenido principal -->
+    <main class="main-content">
+      <!-- Dashboard -->
+      <div class="tab-content active" id="dashboard-tab">
+        <h1 class="text-xl font-bold mb-4">Dashboard</h1>
+        
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Resumen</div>
+            </div>
+            <div class="card-body">
+              <div class="flex items-center gap-4 mb-4">
+                <div class="flex flex-col">
+                  <span class="text-muted">Bots Activos</span>
+                  <span class="text-xl font-bold" id="activeBotCount">0</span>
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-muted">Servidores</span>
+                  <span class="text-xl font-bold" id="totalServerCount">0</span>
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-muted">Comandos</span>
+                  <span class="text-xl font-bold" id="totalCommandCount">0</span>
+                </div>
+              </div>
+              <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                  <strong>Consejo:</strong> Configura tu primer bot para comenzar.
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Estado del Sistema</div>
+            </div>
+            <div class="card-body">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="badge badge-success">
+                  <i class="fas fa-check-circle"></i>
+                  Sistema Operativo
+                </span>
+              </div>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="badge badge-success">
+                  <i class="fas fa-check-circle"></i>
+                  API de Discord
+                </span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="badge badge-success">
+                  <i class="fas fa-check-circle"></i>
+                  Base de Datos
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Actividad Reciente</div>
+            </div>
+            <div class="card-body">
+              <div class="text-center text-muted">
+                <i class="fas fa-history fa-3x mb-2"></i>
+                <p>No hay actividad reciente</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Bots -->
+      <div class="tab-content hidden" id="bots-tab">
+        <h1 class="text-xl font-bold mb-4">Mis Bots</h1>
+        
+        <div class="card mb-4">
+          <div class="card-header">
+            <div class="card-title">Bots Activos</div>
+            <button class="btn btn-primary" id="addNewBotBtn">
+              <i class="fas fa-plus"></i>
+              Nuevo Bot
+            </button>
+          </div>
+          <div class="card-body" id="botsList">
+            <div class="text-center text-muted">
+              <i class="fas fa-robot fa-3x mb-2"></i>
+              <p>No hay bots configurados</p>
+              <button class="btn btn-primary mt-4" id="configureFirstBot">
+                Configurar mi primer bot
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Comandos -->
+      <div class="tab-content hidden" id="commands-tab">
+        <h1 class="text-xl font-bold mb-4">Gestión de Comandos</h1>
+        
+        <div class="card mb-4">
+          <div class="card-header">
+            <div class="card-title">Crear Comando</div>
+          </div>
+          <div class="card-body">
+            <form id="commandForm">
+              <div class="form-group">
+                <label class="form-label" for="commandBot">Bot</label>
+                <select class="form-input form-select" id="commandBot" required>
+                  <option value="">Selecciona un bot</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label" for="commandTrigger">Activador del Comando</label>
+                <div class="flex items-center gap-2">
+                  <span id="commandPrefix">!</span>
+                  <input type="text" class="form-input" id="commandTrigger" placeholder="hola" required>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label" for="commandDescription">Descripción (opcional)</label>
+                <input type="text" class="form-input" id="commandDescription" placeholder="Describe lo que hace este comando">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label" for="commandCooldown">Tiempo de Espera (segundos)</label>
+                <input type="number" class="form-input" id="commandCooldown" placeholder="0" min="0" value="0">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Tipo de Comando</label>
+                <div class="flex gap-4 flex-col">
+                  <label class="flex items-center gap-2">
+                    <input type="radio" name="commandType" value="simple" checked>
+                    Simple (Respuesta de texto)
+                  </label>
+                  <label class="flex items-center gap-2">
+                    <input type="radio" name="commandType" value="advanced">
+                    Avanzado (Código personalizado)
+                  </label>
+                </div>
+              </div>
+              
+              <div id="simpleResponseContainer" class="form-group">
+                <label class="form-label" for="commandResponse">Respuesta</label>
+                <textarea class="form-input form-textarea" id="commandResponse" placeholder="¡Hola! ¿Cómo estás?"></textarea>
+              </div>
+              
+              <div id="advancedCodeContainer" class="form-group hidden">
+                <label class="form-label" for="commandCode">Código Personalizado</label>
+                <textarea class="form-input form-textarea code-editor" id="commandCode" placeholder="// Ejemplo:
+// message.reply('Hola ' + message.author.username);
+// 
+
+// Puedes usar:
+// - message: El mensaje que activó el comando
+// - args: Los argumentos pasados al comando
+// - client: El cliente de Discord.js
+
+async function run() {
+  // Tu código aquí
+  await message.reply('Hola ' + message.author.username);
+}
+
+run();"></textarea>
+              </div>
+              
+              <div class="flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save"></i>
+                  Guardar Comando
+                </button>
+                <button type="reset" class="btn btn-secondary">
+                  <i class="fas fa-undo"></i>
+                  Limpiar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Comandos Existentes</div>
+            <select class="form-input form-select" id="commandFilterBot" style="width: auto;">
+              <option value="all">Todos los bots</option>
+            </select>
+          </div>
+          <div class="card-body">
+            <div id="commandsList" class="command-list">
+              <div class="text-center text-muted">
+                <i class="fas fa-terminal fa-3x mb-2"></i>
+                <p>No hay comandos configurados</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Servidores -->
+      <div class="tab-content hidden" id="servers-tab">
+        <h1 class="text-xl font-bold mb-4">Servidores Conectados</h1>
+        
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Servidores</div>
+            <select class="form-input form-select" id="serverFilterBot" style="width: auto;">
+              <option value="">Selecciona un bot</option>
+            </select>
+          </div>
+          <div class="card-body">
+            <div id="serversList" class="servers-list">
+              <div class="text-center text-muted">
+                <i class="fas fa-server fa-3x mb-2"></i>
+                <p>El bot no está conectado o no está en ningún servidor</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Configuración -->
+      <div class="tab-content hidden" id="settings-tab">
+        <h1 class="text-xl font-bold mb-4">Configuración</h1>
+        
+        <div class="card mb-4">
+          <div class="card-header">
+            <div class="card-title">Apariencia</div>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Tema</label>
+              <div class="flex gap-4">
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="theme" value="dark" checked>
+                  Oscuro
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="theme" value="light">
+                  Claro
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Interfaz</label>
+              <div class="flex gap-4">
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="interface" value="mobile">
+                  Móvil
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="interface" value="desktop">
+                  PC
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card mb-4">
+          <div class="card-header">
+            <div class="card-title">Próximamente</div>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle"></i>
+              <div>
+                <strong>Próximas funciones:</strong>
+                <ul class="mt-2" style="padding-left: 20px;">
+                  <li>Inicio de sesión con Discord</li>
+                  <li>Verificación de dos pasos</li>
+                  <li>Estadísticas avanzadas</li>
+                  <li>Personalización de temas</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Modal para configurar bot -->
+  <div class="modal-backdrop hidden" id="botConfigModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Configurar Bot</div>
+        <button class="modal-close" id="closeBotConfigModal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="botConfigForm">
+          <div class="form-group">
+            <label class="form-label" for="botToken">Token de Discord</label>
+            <input type="password" class="form-input" id="botToken" placeholder="Ingresa el token de tu bot" required>
+            <p class="text-sm text-muted mt-2">Nunca compartas tu token con nadie.</p>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="botPrefix">Prefijo de Comandos</label>
+            <input type="text" class="form-input" id="botPrefix" placeholder="!" value="!">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="botName">Nombre del Bot</label>
+            <input type="text" class="form-input" id="botName" placeholder="Bot de Discord" value="Bot de Discord">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="botId">ID del Bot (opcional)</label>
+            <input type="text" class="form-input" id="botId" placeholder="default">
+            <p class="text-sm text-muted mt-2">Usa un ID único si quieres manejar múltiples bots.</p>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Estado Inicial</label>
+            <div class="flex gap-4 flex-col">
+              <label class="flex items-center gap-2">
+                <input type="radio" name="botState" value="active" checked>
+                Activo
+              </label>
+              <label class="flex items-center gap-2">
+                <input type="radio" name="botState" value="readonly">
+                Solo Lectura
+              </label>
+              <label class="flex items-center gap-2">
+                <input type="radio" name="botState" value="maintenance">
+                Mantenimiento
+              </label>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancelBotConfig">Cancelar</button>
+        <button class="btn btn-primary" id="saveBotConfig">Guardar</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal para variantes de comandos -->
+  <div class="modal-backdrop hidden" id="variantModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Variantes para <span id="variantCommandName"></span></div>
+        <button class="modal-close" id="closeVariantModal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="variantForm">
+          <div class="form-group">
+            <label class="form-label" for="variantName">Nombre de la Variante</label>
+            <input type="text" class="form-input" id="variantName" placeholder="normal" required>
+            <p class="text-sm text-muted mt-2">Se usará como !comando -variante</p>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Tipo de Variante</label>
+            <div class="flex gap-4 flex-col">
+              <label class="flex items-center gap-2">
+                <input type="radio" name="variantType" value="simple" checked>
+                Simple (Respuesta de texto)
+              </label>
+              <label class="flex items-center gap-2">
+                <input type="radio" name="variantType" value="advanced">
+                Avanzado (Código personalizado)
+              </label>
+            </div>
+          </div>
+          
+          <div id="variantResponseContainer" class="form-group">
+            <label class="form-label" for="variantResponse">Respuesta</label>
+            <textarea class="form-input form-textarea" id="variantResponse" placeholder="Respuesta para esta variante"></textarea>
+          </div>
+          
+          <div id="variantCodeContainer" class="form-group hidden">
+            <label class="form-label" for="variantCode">Código Personalizado</label>
+            <textarea class="form-input form-textarea code-editor" id="variantCode" placeholder="// Código para esta variante
+async function run() {
+  await message.reply('Esta es la variante ' + args.join(' '));
+}
+
+run();"></textarea>
+          </div>
+          
+          <button type="submit" class="btn btn-primary w-full">
+            <i class="fas fa-save"></i>
+            Guardar Variante
+          </button>
+        </form>
+        
+        <div class="mt-4">
+          <h4 class="font-bold mb-2">Variantes Existentes</h4>
+          <div id="variantList" class="variant-list">
+            <div class="text-center text-muted">
+              <p>No hay variantes para este comando</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Contenedor de toasts -->
+  <div class="toast-container" id="toastContainer"></div>
+  
+  <!-- JavaScript -->
+  <script>
+    // Elementos DOM
+    const deviceSelector = document.getElementById('deviceSelector');
+    const deviceOptions = document.querySelectorAll('.device-option');
+    const themeToggle = document.getElementById('themeToggle');
+    const themeRadios = document.querySelectorAll('input[name="theme"]');
+    const interfaceRadios = document.querySelectorAll('input[name="interface"]');
+    const tabButtons = document.querySelectorAll('.nav-item');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const collapseSidebar = document.getElementById('collapseSidebar');
+    const sidebar = document.querySelector('.sidebar');
+    const mainContent = document.querySelector('.main-content');
+    const addBotBtn = document.getElementById('addBotBtn');
+    const addNewBotBtn = document.getElementById('addNewBotBtn');
+    const configureFirstBot = document.getElementById('configureFirstBot');
+    const botConfigModal = document.getElementById('botConfigModal');
+    const closeBotConfigModal = document.getElementById('closeBotConfigModal');
+    const cancelBotConfig = document.getElementById('cancelBotConfig');
+    const saveBotConfig = document.getElementById('saveBotConfig');
+    const botConfigForm = document.getElementById('botConfigForm');
+    const commandForm = document.getElementById('commandForm');
+    const commandTypeRadios = document.querySelectorAll('input[name="commandType"]');
+    const simpleResponseContainer = document.getElementById('simpleResponseContainer');
+    const advancedCodeContainer = document.getElementById('advancedCodeContainer');
+    const commandFilterBot = document.getElementById('commandFilterBot');
+    const serverFilterBot = document.getElementById('serverFilterBot');
+    const commandBot = document.getElementById('commandBot');
+    const commandsList = document.getElementById('commandsList');
+    const serversList = document.getElementById('serversList');
+    const botsList = document.getElementById('botsList');
+    const variantModal = document.getElementById('variantModal');
+    const closeVariantModal = document.getElementById('closeVariantModal');
+    const variantForm = document.getElementById('variantForm');
+    const variantCommandName = document.getElementById('variantCommandName');
+    const variantTypeRadios = document.querySelectorAll('input[name="variantType"]');
+    const variantResponseContainer = document.getElementById('variantResponseContainer');
+    const variantCodeContainer = document.getElementById('variantCodeContainer');
+    const variantList = document.getElementById('variantList');
+    const toastContainer = document.getElementById('toastContainer');
+    
+    // Estado
+    let currentCommandId = null;
+    let currentVariantCommand = null;
+    let statusInterval = null;
+    let currentBotId = 'default';
+    let currentBotState = 'active';
+    let isMobile = false;
+    
+    // Detectar dispositivo automáticamente
+    async function detectDevice() {
+      try {
+        const response = await fetch('/api/detect-device');
+        const data = await response.json();
+        
+        if (data.isMobile) {
+          setInterface('mobile');
+        } else {
+          setInterface('desktop');
+        }
+        
+        // Guardar preferencia
+        localStorage.setItem('interface', data.isMobile ? 'mobile' : 'desktop');
+        
+        // Ocultar selector si ya tenemos la preferencia guardada
+        if (localStorage.getItem('interface')) {
+          deviceSelector.classList.add('hidden');
+        }
+      } catch (error) {
+        console.error('Error al detectar dispositivo:', error);
+      }
+    }
+    
+    // Selector de dispositivo
+    deviceOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        const device = option.getAttribute('data-device');
+        setInterface(device);
+        localStorage.setItem('interface', device);
+        deviceSelector.classList.add('hidden');
+      });
+    });
+    
+    // Establecer interfaz
+    function setInterface(device) {
+      isMobile = device === 'mobile';
+      
+      if (isMobile) {
+        document.body.classList.add('mobile');
+        sidebar.classList.add('collapsed');
+        interfaceRadios[0].checked = true;
+      } else {
+        document.body.classList.remove('mobile');
+        sidebar.classList.remove('collapsed');
+        interfaceRadios[1].checked = true;
+      }
+      
+      // Actualizar la apariencia
+      updateLayout();
+    }
+    
+    // Actualizar layout
+    function updateLayout() {
+      if (isMobile) {
+        mainContent.style.width = '100%';
+      } else {
+        mainContent.style.width = sidebar.classList.contains('collapsed') ? 
+          `calc(100% - ${getComputedStyle(document.documentElement).getPropertyValue('--sidebar-collapsed')})` : 
+          `calc(100% - ${getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width')})`;
+      }
+    }
+    
+    // Cambiar tema
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = document.body.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      document.body.setAttribute('data-theme', newTheme);
+      themeToggle.innerHTML = newTheme === 'dark' ? 
+        '<i class="fas fa-moon"></i>' : 
+        '<i class="fas fa-sun"></i>';
+      
+      // Actualizar radio buttons
+      themeRadios.forEach(radio => {
+        radio.checked = radio.value === newTheme;
+      });
+      
+      // Guardar preferencia
+      localStorage.setItem('theme', newTheme);
+    });
+    
+    // Radio buttons de tema
+    themeRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (radio.checked) {
+          document.body.setAttribute('data-theme', radio.value);
+          themeToggle.innerHTML = radio.value === 'dark' ? 
+            '<i class="fas fa-moon"></i>' : 
+            '<i class="fas fa-sun"></i>';
+          
+          // Guardar preferencia
+          localStorage.setItem('theme', radio.value);
+        }
+      });
+    });
+    
+    // Radio buttons de interfaz
+    interfaceRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (radio.checked) {
+          setInterface(radio.value);
+        }
+      });
+    });
+    
+    // Colapsar sidebar
+    collapseSidebar.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+      
+      // Cambiar icono
+      collapseSidebar.innerHTML = sidebar.classList.contains('collapsed') ? 
+        '<i class="fas fa-chevron-right"></i>' : 
+        '<i class="fas fa-chevron-left"></i>';
+      
+      // Actualizar layout
+      updateLayout();
+    });
+    
+    // Navegación por tabs
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        // Actualizar botón activo
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        
+        // Mostrar contenido correspondiente
+        const tabId = button.getAttribute('data-tab');
+        tabContents.forEach(content => {
+          content.classList.add('hidden');
+        });
+        
+        const activeTab = document.getElementById(`${tabId}-tab`);
+        activeTab.classList.remove('hidden');
+        
+        // Cargar datos específicos de la pestaña
+        if (tabId === 'servers') {
+          loadServers();
+        } else if (tabId === 'commands') {
+          loadCommands();
+        } else if (tabId === 'bots') {
+          loadBots();
+        } else if (tabId === 'dashboard') {
+          loadDashboardData();
+        }
+      });
+    });
+    
+    // Abrir modal de configuración de bot
+    addBotBtn.addEventListener('click', openBotConfigModal);
+    addNewBotBtn.addEventListener('click', openBotConfigModal);
+    configureFirstBot.addEventListener('click', openBotConfigModal);
+    
+    function openBotConfigModal() {
+      botConfigModal.classList.remove('hidden');
+      document.getElementById('botToken').value = '';
+      document.getElementById('botPrefix').value = '!';
+      document.getElementById('botName').value = 'Bot de Discord';
+      document.getElementById('botId').value = '';
+      document.querySelector('input[name="botState"][value="active"]').checked = true;
+    }
+    
+    // Cerrar modal de configuración de bot
+    closeBotConfigModal.addEventListener('click', () => {
+      botConfigModal.classList.add('hidden');
+    });
+    
+    cancelBotConfig.addEventListener('click', () => {
+      botConfigModal.classList.add('hidden');
+    });
+    
+    // Guardar configuración de bot
+    saveBotConfig.addEventListener('click', async () => {
+      const token = document.getElementById('botToken').value;
+      const prefix = document.getElementById('botPrefix').value || '!';
+      const botName = document.getElementById('botName').value || 'Bot de Discord';
+      const botId = document.getElementById('botId').value || 'default';
+      const botState = document.querySelector('input[name="botState"]:checked').value;
+      
+      if (!token) {
+        showToast('El token es requerido', 'error');
+        return;
+      }
+      
+      try {
+        showToast('Conectando bot...', 'info');
+        
+        const response = await fetch('/api/config', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ token, prefix, botId, botName, botState })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          showToast('Bot configurado correctamente', 'success');
+          currentBotId = data.botId;
+          botConfigModal.classList.add('hidden');
+          loadBots();
+          loadDashboardData();
+          
+          // Actualizar selectores de bots
+          updateBotSelectors();
+        } else {
+          showToast(`Error: ${data.message}`, 'error');
+        }
+      } catch (error) {
+        showToast(`Error: ${error.message}`, 'error');
+      }
+    });
+    
+    // Tipo de comando
+    commandTypeRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (radio.value === 'simple') {
+          simpleResponseContainer.classList.remove('hidden');
+          advancedCodeContainer.classList.add('hidden');
+        } else {
+          simpleResponseContainer.classList.add('hidden');
+          advancedCodeContainer.classList.remove('hidden');
+        }
+      });
+    });
+    
+    // Tipo de variante
+    variantTypeRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (radio.value === 'simple') {
+          variantResponseContainer.classList.remove('hidden');
+          variantCodeContainer.classList.add('hidden');
+        } else {
+          variantResponseContainer.classList.add('hidden');
+          variantCodeContainer.classList.remove('hidden');
+        }
+      });
+    });
+    
+    // Formulario de comando
+    commandForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const botId = document.getElementById('commandBot').value;
+      const trigger = document.getElementById('commandTrigger').value;
+      const type = document.querySelector('input[name="commandType"]:checked').value;
+      const response = document.getElementById('commandResponse').value;
+      const code = document.getElementById('commandCode').value;
+      const description = document.getElementById('commandDescription').value;
+      const cooldown = document.getElementById('commandCooldown').value;
+      
+      if (!botId) {
+        showToast('Selecciona un bot', 'error');
+        return;
+      }
+      
+      if (!trigger) {
+        showToast('El activador del comando es requerido', 'error');
+        return;
+      }
+      
+      if (type === 'simple' && !response) {
+        showToast('La respuesta es requerida para comandos simples', 'error');
+        return;
+      }
+      
+      if (type === 'advanced' && !code) {
+        showToast('El código es requerido para comandos avanzados', 'error');
+        return;
+      }
+      
+      try {
+        showToast('Guardando comando...', 'info');
+        
+        const commandData = {
+          trigger,
+          type,
+          botId,
+          description,
+          cooldown: parseInt(cooldown) || 0
+        };
+        
+        if (type === 'simple') {
+          commandData.response = response;
+        } else {
+          commandData.code = code;
+        }
+        
+        const apiResponse = await fetch('/api/commands', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(commandData)
+        });
+        
+        const data = await apiResponse.json();
+        
+        if (data.success) {
+          showToast('Comando guardado correctamente', 'success');
+          commandForm.reset();
+          document.querySelector('input[name="commandType"][value="simple"]').checked = true;
+          simpleResponseContainer.classList.remove('hidden');
+          advancedCodeContainer.classList.add('hidden');
+          loadCommands();
+          loadDashboardData();
+        } else {
+          showToast(`Error: ${data.message}`, 'error');
+        }
+      } catch (error) {
+        showToast(`Error: ${error.message}`, 'error');
+      }
+    });
+    
+    // Formulario de variante
+    variantForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const variantName = document.getElementById('variantName').value;
+      const type = document.querySelector('input[name="variantType"]:checked').value;
+      const response = document.getElementById('variantResponse').value;
+      const code = document.getElementById('variantCode').value;
+      
+      if (!variantName) {
+        showToast('El nombre de la variante es requerido', 'error');
+        return;
+      }
+      
+      if (type === 'simple' && !response) {
+        showToast('La respuesta es requerida para variantes simples', 'error');
+        return;
+      }
+      
+      if (type === 'advanced' && !code) {
+        showToast('El código es requerido para variantes avanzadas', 'error');
+        return;
+      }
+      
+      try {
+        showToast('Guardando variante...', 'info');
+        
+        const variantData = {
+          commandTrigger: currentVariantCommand,
+          variantName,
+          botId: currentBotId
+        };
+        
+        if (type === 'simple') {
+          variantData.response = response;
+        } else {
+          variantData.code = code;
+        }
+        
+        const apiResponse = await fetch('/api/command-variants', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(variantData)
+        });
+        
+        const data = await apiResponse.json();
+        
+        if (data.success) {
+          showToast('Variante guardada correctamente', 'success');
+          document.getElementById('variantName').value = '';
+          document.getElementById('variantResponse').value = '';
+          document.getElementById('variantCode').value = '';
+          loadVariants(currentVariantCommand);
+        } else {
+          showToast(`Error: ${data.message}`, 'error');
+        }
+      } catch (error) {
+        showToast(`Error: ${error.message}`, 'error');
+      }
+    });
+    
+    // Cerrar modal de variantes
+    closeVariantModal.addEventListener('click', () => {
+      variantModal.classList.add('hidden');
+    });
+    
+    // Cargar bots
+    async function loadBots() {
+      try {
+        const response = await fetch('/api/bots');
+        const data = await response.json();
+        
+        if (data.success && data.bots.length > 0) {
+          botsList.innerHTML = '';
+          
+          data.bots.forEach(bot => {
+            const statusClass = getStatusClass(bot.status);
+            const statusText = getStatusText(bot.status);
+            const stateText = getStateText(bot.state);
+            const stateClass = getStateClass(bot.state);
+            
+            const botCard = document.createElement('div');
+            botCard.className = 'card mb-4';
+            
+            botCard.innerHTML = `
+              <div class="card-header">
+                <div class="card-title">${bot.name}</div>
+                <div class="badge ${statusClass}">${statusText}</div>
+              </div>
+              <div class="card-body">
+                <div class="flex flex-col gap-2">
+                  <div><strong>ID:</strong> ${bot.botId}</div>
+                  <div><strong>Nombre de usuario:</strong> ${bot.username || 'Desconocido'}</div>
+                  <div><strong>Prefijo:</strong> ${bot.prefix}</div>
+                  <div><strong>Servidores:</strong> ${bot.serverCount || 0}</div>
+                  <div><strong>Estado:</strong> <span class="badge ${stateClass}">${stateText}</span></div>
+                  <div><strong>Tiempo activo:</strong> ${formatUptime(bot.uptime)}</div>
+                </div>
+              </div>
+              <div class="card-footer">
+                <button class="btn btn-danger disconnect-bot" data-id="${bot.botId}">
+                  <i class="fas fa-power-off"></i>
+                  Desconectar
+                </button>
+              </div>
+            `;
+            
+            botsList.appendChild(botCard);
+            
+            // Evento para desconectar bot
+            const disconnectBtn = botCard.querySelector('.disconnect-bot');
+            disconnectBtn.addEventListener('click', () => disconnectBot(bot.botId));
+          });
+          
+          // Mostrar mensaje de bots configurados
+          document.querySelector('#botsList .text-center')?.classList.add('hidden');
+        } else {
+          botsList.innerHTML = `
+            <div class="text-center text-muted">
+              <i class="fas fa-robot fa-3x mb-2"></i>
+              <p>No hay bots configurados</p>
+              <button class="btn btn-primary mt-4" id="configureFirstBotInList">
+                Configurar mi primer bot
+              </button>
+            </div>
+          `;
+          
+          // Evento para configurar primer bot
+          document.getElementById('configureFirstBotInList')?.addEventListener('click', openBotConfigModal);
+        }
+        
+        // Actualizar selectores de bots
+        updateBotSelectors();
+      } catch (error) {
+        showToast(`Error al cargar bots: ${error.message}`, 'error');
+      }
+    }
+    
+    // Actualizar selectores de bots
+    async function updateBotSelectors() {
+      try {
+        const response = await fetch('/api/bots');
+        const data = await response.json();
+        
+        if (data.success) {
+          // Limpiar selectores
+          commandBot.innerHTML = '<option value="">Selecciona un bot</option>';
+          commandFilterBot.innerHTML = '<option value="all">Todos los bots</option>';
+          serverFilterBot.innerHTML = '<option value="">Selecciona un bot</option>';
+          
+          // Añadir opciones
+          data.bots.forEach(bot => {
+            const option1 = document.createElement('option');
+            option1.value = bot.botId;
+            option1.textContent = bot.name;
+            
+            const option2 = document.createElement('option');
+            option2.value = bot.botId;
+            option2.textContent = bot.name;
+            
+            const option3 = document.createElement('option');
+            option3.value = bot.botId;
+            option3.textContent = bot.name;
+            
+            commandBot.appendChild(option1);
+            commandFilterBot.appendChild(option2);
+            serverFilterBot.appendChild(option3);
+          });
+        }
+      } catch (error) {
+        console.error('Error al actualizar selectores de bots:', error);
+      }
+    }
+    
+    // Desconectar bot
+    async function disconnectBot(botId) {
+      if (!confirm(`¿Estás seguro de que deseas desconectar el bot ${botId}?`)) {
+        return;
+      }
+      
+      try {
+        showToast('Desconectando bot...', 'info');
+        
+        const response = await fetch('/api/disconnect', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ botId })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          showToast('Bot desconectado correctamente', 'success');
+          loadBots();
+          loadDashboardData();
+        } else {
+          showToast(`Error: ${data.message}`, 'error');
+        }
+      } catch (error) {
+        showToast(`Error: ${error.message}`, 'error');
+      }
+    }
+    
+    // Cargar comandos
+    async function loadCommands() {
+      try {
+        const botId = commandFilterBot.value === 'all' ? '' : commandFilterBot.value;
+        const url = botId ? `/api/commands?botId=${botId}` : '/api/commands';
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.success && data.commands.length > 0) {
+          commandsList.innerHTML = '';
+          
+          data.commands.forEach(command => {
+            const commandCard = document.createElement('div');
+            commandCard.className = 'card mb-4';
+            
+            commandCard.innerHTML = `
+              <div class="card-header">
+                <div class="card-title">!${command.trigger}</div>
+                <div class="flex gap-2">
+                  <button class="btn btn-secondary btn-icon edit-command" data-id="${command.trigger}" data-bot="${command.botId || 'default'}">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn btn-primary btn-icon variants-command" data-id="${command.trigger}" data-bot="${command.botId || 'default'}">
+                    <i class="fas fa-code-branch"></i>
+                  </button>
+                  <button class="btn btn-danger btn-icon delete-command" data-id="${command.trigger}" data-bot="${command.botId || 'default'}">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="flex flex-col gap-2">
+                  ${command.description ? `<div><strong>Descripción:</strong> ${command.description}</div>` : ''}
+                  <div><strong>Tipo:</strong> ${command.type === 'simple' ? 'Simple' : 'Avanzado'}</div>
+                  <div><strong>Bot:</strong> ${command.botId || 'default'}</div>
+                  ${command.cooldown > 0 ? `<div><strong>Tiempo de espera:</strong> ${command.cooldown} segundos</div>` : ''}
+                  ${command.type === 'simple' ? 
+                    `<div><strong>Respuesta:</strong> ${command.response}</div>` : 
+                    `<div><strong>Código:</strong> <pre class="code-editor mt-2">${command.code}</pre></div>`
+                  }
+                </div>
+              </div>
+            `;
+            
+            commandsList.appendChild(commandCard);
+            
+            // Eventos para botones
+            const editBtn = commandCard.querySelector('.edit-command');
+            const deleteBtn = commandCard.querySelector('.delete-command');
+            const variantsBtn = commandCard.querySelector('.variants-command');
+            
+            editBtn.addEventListener('click', () => editCommand(command));
+            deleteBtn.addEventListener('click', () => deleteCommand(command.trigger, command.botId || 'default'));
+            variantsBtn.addEventListener('click', () => showVariants(command.trigger, command.botId || 'default'));
+          });
+        } else {
+          commandsList.innerHTML = `
+            <div class="text-center text-muted">
+              <i class="fas fa-terminal fa-3x mb-2"></i>
+              <p>No hay comandos configurados</p>
+            </div>
+          `;
+        }
+      } catch (error) {
+        showToast(`Error al cargar comandos: ${error.message}`, 'error');
+      }
+    }
+    
+    // Editar comando
+    function editCommand(command) {
+      // Seleccionar el bot
+      document.getElementById('commandBot').value = command.botId || 'default';
+      
+      // Llenar formulario
+      document.getElementById('commandTrigger').value = command.trigger;
+      document.getElementById('commandDescription').value = command.description || '';
+      document.getElementById('commandCooldown').value = command.cooldown || 0;
+      
+      // Seleccionar tipo
+      if (command.type === 'simple') {
+        document.querySelector('input[name="commandType"][value="simple"]').checked = true;
+        document.getElementById('commandResponse').value = command.response;
+        simpleResponseContainer.classList.remove('hidden');
+        advancedCodeContainer.classList.add('hidden');
+      } else {
+        document.querySelector('input[name="commandType"][value="advanced"]').checked = true;
+        document.getElementById('commandCode').value = command.code;
+        simpleResponseContainer.classList.add('hidden');
+        advancedCodeContainer.classList.remove('hidden');
+      }
+      
+      // Scroll al formulario
+      commandForm.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // Eliminar comando
+    async function deleteCommand(trigger, botId) {
+      if (!confirm(`¿Estás seguro de que deseas eliminar el comando !${trigger}?`)) {
+        return;
+      }
+      
+      try {
+        showToast('Eliminando comando...', 'info');
+        
+        const response = await fetch(`/api/commands/${trigger}?botId=${botId}`, {
+          method: 'DELETE'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          showToast('Comando eliminado correctamente', 'success');
+          loadCommands();
+          loadDashboardData();
+        } else {
+          showToast(`Error: ${data.message}`, 'error');
+        }
+      } catch (error) {
+        showToast(`Error: ${error.message}`, 'error');
+      }
+    }
+    
+    // Mostrar variantes
+    function showVariants(commandTrigger, botId) {
+      currentVariantCommand = commandTrigger;
+      currentBotId = botId;
+      variantCommandName.textContent = `!${commandTrigger}`;
+      
+      // Limpiar formulario
+      variantForm.reset();
+      document.getElementById('variantResponse').value = '';
+      document.getElementById('variantCode').value = '';
+      
+      // Mostrar modal
+      variantModal.classList.remove('hidden');
+      
+      // Cargar variantes
+      loadVariants(commandTrigger, botId);
+    }
+    
+    // Cargar variantes
+    async function loadVariants(commandTrigger, botId) {
+      try {
+        const response = await fetch(`/api/command-variants?command=${commandTrigger}&botId=${botId}`);
+        const data = await response.json();
+        
+        if (data.success && data.variants.length > 0) {
+          variantList.innerHTML = '';
+          
+          data.variants.forEach(variant => {
+            const variantItem = document.createElement('div');
+            variantItem.className = 'card mb-2';
+            
+            variantItem.innerHTML = `
+              <div class="card-header">
+                <div class="card-title">-${variant.variantName}</div>
+                <button class="btn btn-danger btn-icon delete-variant" data-command="${commandTrigger}" data-variant="${variant.variantName}" data-bot="${botId}">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+              <div class="card-body">
+                <div><strong>Tipo:</strong> ${variant.type === 'simple' ? 'Simple' : 'Avanzado'}</div>
+                ${variant.type === 'simple' ? 
+                  `<div><strong>Respuesta:</strong> ${variant.response}</div>` : 
+                  `<div><strong>Código:</strong> <pre class="code-editor mt-2">${variant.code}</pre></div>`
+                }
+              </div>
+            `;
+            
+            variantList.appendChild(variantItem);
+            
+            // Evento para eliminar variante
+            const deleteBtn = variantItem.querySelector('.delete-variant');
+            deleteBtn.addEventListener('click', () => deleteVariant(variant.commandTrigger, variant.variantName, botId));
+          });
+        } else {
+          variantList.innerHTML = `
+            <div class="text-center text-muted">
+              <p>No hay variantes para este comando</p>
+            </div>
+          `;
+        }
+      } catch (error) {
+        showToast(`Error al cargar variantes: ${error.message}`, 'error');
+      }
+    }
+    
+    // Eliminar variante
+    async function deleteVariant(commandTrigger, variantName, botId) {
+      if (!confirm(`¿Estás seguro de que deseas eliminar la variante -${variantName} del comando !${commandTrigger}?`)) {
+        return;
+      }
+      
+      try {
+        showToast('Eliminando variante...', 'info');
+        
+        const response = await fetch(`/api/command-variants/${commandTrigger}/${variantName}?botId=${botId}`, {
+          method: 'DELETE'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          showToast('Variante eliminada correctamente', 'success');
+          loadVariants(commandTrigger, botId);
+        } else {
+          showToast(`Error: ${data.message}`, 'error');
+        }
+      } catch (error) {
+        showToast(`Error: ${error.message}`, 'error');
+      }
+    }
+    
+    // Cargar servidores
+    async function loadServers() {
+      try {
+        const botId = serverFilterBot.value;
+        
+        if (!botId) {
+          serversList.innerHTML = `
+            <div class="text-center text-muted">
+              <i class="fas fa-server fa-3x mb-2"></i>
+              <p>Selecciona un bot para ver sus servidores</p>
+            </div>
+          `;
+          return;
+        }
+        
+        const response = await fetch(`/api/servers?botId=${botId}`);
+        const data = await response.json();
+        
+        if (data.success && data.servers.length > 0) {
+          serversList.innerHTML = '';
+          
+          data.servers.forEach(server => {
+            const serverCard = document.createElement('div');
+            serverCard.className = 'card mb-4';
+            
+            let serverIcon;
+            if (server.icon) {
+              serverIcon = `<img src="${server.icon}" alt="${server.name}" class="w-12 h-12 rounded-full">`;
+            } else {
+              serverIcon = `<div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-bright font-bold">${server.name.charAt(0)}</div>`;
+            }
+            
+            serverCard.innerHTML = `
+              <div class="card-header">
+                <div class="card-title">${server.name}</div>
+              </div>
+              <div class="card-body">
+                <div class="flex items-center gap-4">
+                  ${serverIcon}
+                  <div class="flex flex-col gap-1">
+                    <div><strong>ID:</strong> ${server.id}</div>
+                    <div><strong>Miembros:</strong> ${server.memberCount}</div>
+                  </div>
+                </div>
+              </div>
+            `;
+            
+            serversList.appendChild(serverCard);
+          });
+        } else {
+          serversList.innerHTML = `
+            <div class="text-center text-muted">
+              <i class="fas fa-server fa-3x mb-2"></i>
+              <p>El bot no está conectado o no está en ningún servidor</p>
+            </div>
+          `;
+        }
+      } catch (error) {
+        showToast(`Error al cargar servidores: ${error.message}`, 'error');
+      }
+    }
+    
+    // Cargar datos del dashboard
+    async function loadDashboardData() {
+      try {
+        // Cargar bots
+        const botsResponse = await fetch('/api/bots');
+        const botsData = await botsResponse.json();
+        
+        // Actualizar contadores
+        const activeBotCount = document.getElementById('activeBotCount');
+        const totalServerCount = document.getElementById('totalServerCount');
+        const totalCommandCount = document.getElementById('totalCommandCount');
+        
+        if (botsData.success) {
+          // Contar bots activos
+          const activeBotsCount = botsData.bots.filter(bot => bot.status === 'connected').length;
+          activeBotCount.textContent = activeBotsCount;
+          
+          // Contar servidores
+          const serversCount = botsData.bots.reduce((total, bot) => total + (bot.serverCount || 0), 0);
+          totalServerCount.textContent = serversCount;
+        } else {
+          activeBotCount.textContent = '0';
+          totalServerCount.textContent = '0';
+        }
+        
+        // Cargar comandos
+        const commandsResponse = await fetch('/api/commands');
+        const commandsData = await commandsResponse.json();
+        
+        if (commandsData.success) {
+          totalCommandCount.textContent = commandsData.commands.length;
+        } else {
+          totalCommandCount.textContent = '0';
+        }
+      } catch (error) {
+        console.error('Error al cargar datos del dashboard:', error);
+      }
+    }
+    
+    // Mostrar toast
+    function showToast(message, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      
+      let icon;
+      switch (type) {
+        case 'success':
+          icon = '<i class="fas fa-check-circle"></i>';
+          break;
+        case 'error':
+          icon = '<i class="fas fa-exclamation-circle"></i>';
+          break;
+        case 'warning':
+          icon = '<i class="fas fa-exclamation-triangle"></i>';
+          break;
+        default:
+          icon = '<i class="fas fa-info-circle"></i>';
+      }
+      
+      toast.innerHTML = `
+        ${icon}
+        <div>${message}</div>
+      `;
+      
+      toastContainer.appendChild(toast);
+      
+      // Eliminar toast después de 3 segundos
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        
+        // Eliminar del DOM después de la animación
+        setTimeout(() => {
+          toastContainer.removeChild(toast);
+        }, 300);
+      }, 3000);
+    }
+    
+    // Formatear tiempo activo
+    function formatUptime(uptime) {
+      if (!uptime) return 'No disponible';
+      
+      const seconds = Math.floor(uptime / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      const days = Math.floor(hours / 24);
+      
+      return `${days}d ${hours % 24}h ${minutes % 60}m ${seconds % 60}s`;
+    }
+    
+    // Obtener clase de estado
+    function getStatusClass(status) {
+      switch (status) {
+        case 'connected':
+          return 'badge-success';
+        case 'connecting':
+          return 'badge-warning';
+        case 'error':
+          return 'badge-danger';
+        default:
+          return 'badge-info';
+      }
+    }
+    
+    // Obtener texto de estado
+    function getStatusText(status) {
+      switch (status) {
+        case 'connected':
+          return 'Conectado';
+        case 'connecting':
+          return 'Conectando...';
+        case 'error':
+          return 'Error';
+        default:
+          return 'Desconectado';
+      }
+    }
+    
+    // Obtener texto de estado del bot
+    function getStateText(state) {
+      switch (state) {
+        case 'active':
+          return 'Activo';
+        case 'readonly':
+          return 'Solo Lectura';
+        case 'maintenance':
+          return 'Mantenimiento';
+        default:
+          return 'Desconocido';
+      }
+    }
+    
+    // Obtener clase de estado del bot
+    function getStateClass(state) {
+      switch (state) {
+        case 'active':
+          return 'badge-success';
+        case 'readonly':
+          return 'badge-warning';
+        case 'maintenance':
+          return 'badge-danger';
+        default:
+          return 'badge-info';
+      }
+    }
+    
+    // Eventos para filtros
+    commandFilterBot.addEventListener('change', loadCommands);
+    serverFilterBot.addEventListener('change', loadServers);
+    
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', () => {
+      // Cargar tema guardado
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        document.body.setAttribute('data-theme', savedTheme);
+        themeToggle.innerHTML = savedTheme === 'dark' ? 
+          '<i class="fas fa-moon"></i>' : 
+          '<i class="fas fa-sun"></i>';
+        
+        // Actualizar radio buttons
+        themeRadios.forEach(radio => {
+          radio.checked = radio.value === savedTheme;
+        });
+      }
+      
+      // Cargar interfaz guardada
+      const savedInterface = localStorage.getItem('interface');
+      if (savedInterface) {
+        setInterface(savedInterface);
+        deviceSelector.classList.add('hidden');
+      } else {
+        // Detectar dispositivo
+        detectDevice();
+      }
+      
+      // Cargar datos iniciales
+      loadBots();
+      loadDashboardData();
+      updateBotSelectors();
+      
+      // Restaurar sesiones
+      restoreSessions();
+    });
+    
+    // Restaurar sesiones
+    async function restoreSessions() {
+      try {
+        const response = await fetch('/api/restore-sessions');
+        const data = await response.json();
+        
+        if (data.success && data.restoredBots && data.restoredBots.length > 0) {
+          showToast(`${data.restoredBots.length} bots restaurados`, 'success');
+          loadBots();
+          loadDashboardData();
+        }
+      } catch (error) {
+        console.error('Error al restaurar sesiones:', error);
+      }
+    }
+  </script>
+</body>
+</html>

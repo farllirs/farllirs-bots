@@ -1,0 +1,42 @@
+{
+  "name": "farllirs-bots",
+  "version": "1.0.0",
+  "description": "Panel de control para bots de Discord",
+  "main": "index.js",
+  "bin": {
+    "farllirs-bots": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js Active"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "panel",
+    "control",
+    "dashboard"
+  ],
+  "author": "Farllirs",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "chalk": "^4.1.2",
+    "discord.js": "^14.14.1",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "farllirs-bots": "^1.0.0",
+    "figlet": "^1.6.0",
+    "inquirer": "^8.2.5"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/farllirs/farllirs-bots.git"
+  },
+  "bugs": {
+    "url": "https://github.com/farllirs/farllirs-bots/issues"
+  },
+  "homepage": "https://github.com/farllirs/farllirs-bots#readme"
+}
